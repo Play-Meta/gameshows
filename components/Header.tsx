@@ -2,11 +2,18 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { useGame } from '@/contexts/GameContext';
 
 const Header: React.FC = () => {
+  const { restartGame } = useGame();
+
+  const handleLogoClick = () => {
+    restartGame();
+  };
+
   return (
     <div className="header">
-      <div className="title-container">
+      <div className="title-container" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
         <Image 
           src="/Meta-Symbol-mono-white.svg" 
           alt="Meta" 
