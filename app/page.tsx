@@ -4,6 +4,7 @@ import React from 'react';
 import { GameProvider, useGame } from '@/contexts/GameContext';
 import MobilePhoneFrame from '@/components/MobilePhoneFrame';
 import Header from '@/components/Header';
+import DevToolbar from '@/components/DevToolbar';
 import WaitingRoom from '@/components/WaitingRoom';
 import Countdown from '@/components/Countdown';
 import OpenerVideo from '@/components/OpenerVideo';
@@ -22,6 +23,7 @@ function GameContent() {
   return (
     <>
       <Header />
+      <DevToolbar />
       <MobilePhoneFrame>
         {gameState === 'waiting' && <WaitingRoom />}
         {gameState === 'countdown' && <Countdown />}

@@ -36,6 +36,7 @@ interface GameContextType {
   playCloser: () => void;
   restartGame: () => void;
   skipToFirstQuestion: () => void;
+  skipToQuestion: (questionIndex: number) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -126,6 +127,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGameState('question-video');
   }, []);
 
+  // Dev helper to skip to any question
+  const skipToQuestion = useCallback((questionIndex: number) => {
+    if (questionIndex >= 0 && questionIndex < QUESTIONS.length) {
+      setCurrentQuestionIndex(questionIndex);
+      setSelectedAnswer(null);
+      setIsCorrect(null);
+      setGameState('question-video');
+    }
+  }, []);
+
   return (
     <GameContext.Provider
       value={{
@@ -147,6 +158,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         playCloser,
         restartGame,
         skipToFirstQuestion,
+        skipToQuestion,
       }}
     >
       {children}
