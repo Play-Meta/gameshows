@@ -136,6 +136,17 @@ body {
   color: #f5f5f5;
 }
 
+/* Custom cursor for desktop/tablet */
+@media (min-width: 769px) {
+  * {
+    cursor: url('/mobile-cursor-default.svg') 12 12, auto !important;
+  }
+  
+  button, a, [role="button"], [onclick] {
+    cursor: url('/mobile-cursor-pointer.svg') 12 12, pointer !important;
+  }
+}
+
 /* Mobile Phone Frame - Desktop Only */
 .phone-frame-container {
   position: fixed;

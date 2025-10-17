@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Howler } from 'howler';
 import { useGame } from '@/contexts/GameContext';
 import DevButton from '@/components/DevButton';
 
@@ -9,11 +10,16 @@ const DevToolbar: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
 
   const handleMuteToggle = () => {
-    setIsMuted(!isMuted);
-    // Get all video and audio elements and mute/unmute them
+    const newMutedState = !isMuted;
+    setIsMuted(newMutedState);
+    
+    // Mute/unmute all Howler sounds (including background music)
+    Howler.mute(newMutedState);
+    
+    // Also get all video and audio elements and mute/unmute them
     const mediaElements = document.querySelectorAll('video, audio');
     mediaElements.forEach((element) => {
-      (element as HTMLVideoElement | HTMLAudioElement).muted = !isMuted;
+      (element as HTMLVideoElement | HTMLAudioElement).muted = newMutedState;
     });
   };
 
