@@ -37,6 +37,7 @@ interface GameContextType {
   restartGame: () => void;
   skipToFirstQuestion: () => void;
   skipToQuestion: (questionIndex: number) => void;
+  skipToQuestionAnswer: (questionIndex: number) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -137,6 +138,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Dev helper to skip to answering state for any question
+  const skipToQuestionAnswer = useCallback((questionIndex: number) => {
+    if (questionIndex >= 0 && questionIndex < QUESTIONS.length) {
+      setCurrentQuestionIndex(questionIndex);
+      setSelectedAnswer(null); // Reset answer so user can select
+      setIsCorrect(null);
+      setGameState('answering'); // Go to answering state, not result
+    }
+  }, []);
+
   return (
     <GameContext.Provider
       value={{
@@ -159,6 +170,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         restartGame,
         skipToFirstQuestion,
         skipToQuestion,
+        skipToQuestionAnswer,
       }}
     >
       {children}

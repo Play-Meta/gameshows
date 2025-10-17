@@ -5,7 +5,7 @@ import { useGame } from '@/contexts/GameContext';
 import DevButton from '@/components/DevButton';
 
 const DevToolbar: React.FC = () => {
-  const { skipToQuestion, restartGame } = useGame();
+  const { skipToQuestion, skipToQuestionAnswer, restartGame } = useGame();
   const [isMuted, setIsMuted] = useState(false);
 
   const handleMuteToggle = () => {
@@ -20,7 +20,7 @@ const DevToolbar: React.FC = () => {
   if (process.env.NODE_ENV !== 'development') return null;
 
   return (
-    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-[10001] flex flex-col gap-2 bg-black/30 backdrop-blur-md p-2 rounded-2xl border border-white/10">
+    <div className="fixed left-4 top-1/2 -translate-y-1/2 z-[10001] flex flex-col gap-2 bg-black/30 backdrop-blur-md p-2 rounded-2xl border border-white/10">
       {/* Skip to Question buttons */}
       <DevButton 
         onClick={() => skipToQuestion(0)} 
@@ -55,6 +55,46 @@ const DevToolbar: React.FC = () => {
         title="Skip to Question 5"
       >
         Q5
+      </DevButton>
+
+      {/* Divider */}
+      <div className="h-px bg-white/20 my-1" />
+
+      {/* Skip to Answer buttons */}
+      <DevButton 
+        onClick={() => skipToQuestionAnswer(0)} 
+        title="Skip to Answer 1"
+        variant="default"
+      >
+        A1
+      </DevButton>
+      
+      <DevButton 
+        onClick={() => skipToQuestionAnswer(1)} 
+        title="Skip to Answer 2"
+      >
+        A2
+      </DevButton>
+      
+      <DevButton 
+        onClick={() => skipToQuestionAnswer(2)} 
+        title="Skip to Answer 3"
+      >
+        A3
+      </DevButton>
+      
+      <DevButton 
+        onClick={() => skipToQuestionAnswer(3)} 
+        title="Skip to Answer 4"
+      >
+        A4
+      </DevButton>
+      
+      <DevButton 
+        onClick={() => skipToQuestionAnswer(4)} 
+        title="Skip to Answer 5"
+      >
+        A5
       </DevButton>
 
       {/* Divider */}

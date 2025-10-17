@@ -44,8 +44,6 @@ const AnswerSelector: React.FC = () => {
 
   if (!currentQuestion) return null;
 
-  const progressPercent = (timeLeft / currentQuestion.timeLimit) * 100;
-
   return (
     <div className="relative flex flex-col h-full">
       {/* Blurred video background */}
@@ -64,12 +62,15 @@ const AnswerSelector: React.FC = () => {
           {/* Sheet Content */}
           <div className="bg-black/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-white/10">
             {/* Timer Bar */}
-            <div className="w-full h-1 bg-gray-800/50">
+            <div className="w-full h-1 bg-gray-800/50 overflow-hidden">
               <div
-                className={`h-full transition-all duration-1000 ${
+                className={`h-full ${
                   timeLeft <= 3 ? 'bg-red-500' : 'bg-green-500'
                 }`}
-                style={{ width: `${progressPercent}%` }}
+                style={{ 
+                  animation: selectedAnswer === null ? `timerCountdown ${currentQuestion.timeLimit}s linear forwards` : 'none',
+                  width: selectedAnswer !== null ? '0%' : '100%'
+                }}
               />
             </div>
 
