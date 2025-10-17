@@ -1,0 +1,319 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optimistic Text Font Faces */
+@font-face {
+  font-family: 'Optimistic Text';
+  src: url('/fonts/OptimisticV5_LightIt.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Optimistic Text';
+  src: url('/fonts/OptimisticV5_Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Optimistic Text';
+  src: url('/fonts/OptimisticV5_SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Optimistic Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #101010;
+  color: #f5f5f5;
+}
+
+/* Mobile Phone Frame - Desktop Only */
+.phone-frame-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  padding: 60px 20px;
+  box-sizing: border-box;
+}
+
+.phone-frame {
+  width: 390px;
+  max-height: calc(100vh - 120px);
+  height: 844px;
+  background: #000000;
+  border-radius: 48px;
+  box-shadow: 
+    0 0 0 12px #1a1a1a,
+    0 0 0 14px #3a3a3a,
+    0 40px 80px rgba(0, 0, 0, 0.8),
+    0 20px 40px rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dynamic Island (iPhone 14 Pro+) */
+.dynamic-island {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  height: 37px;
+  background: #000000;
+  border-radius: 19px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 4px 12px rgba(0, 0, 0, 0.8);
+}
+
+.island-camera {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0a0a0a;
+  box-shadow: 
+    inset 0 0 2px rgba(255, 255, 255, 0.1),
+    0 0 4px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  left: 24px;
+}
+
+/* Phone screen - contains the actual app */
+.phone-screen {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #000000;
+}
+
+/* Home indicator (bottom bar like iPhone) */
+.phone-home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.home-bar {
+  width: 140px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+/* Hide phone frame on mobile */
+@media (max-width: 768px) {
+  .phone-frame-container {
+    padding: 0;
+    background: #000000;
+  }
+  
+  .phone-frame {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  .dynamic-island {
+    display: none;
+  }
+  
+  .phone-home-indicator {
+    display: none;
+  }
+}
+
+/* Game-specific animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Video Styling */
+.video-fullscreen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-blur-background {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(20px);
+  transform: scale(1.1);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Header Styling */
+.header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  background: transparent;
+  pointer-events: none;
+  gap: 16px;
+}
+
+.header > * {
+  pointer-events: auto;
+}
+
+.title-container {
+  cursor: default;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  max-height: 24px;
+  width: auto;
+  object-fit: contain;
+  transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.title-container:hover .logo,
+.title-container:hover .title {
+  opacity: 0.9;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  color: #f5f5f5;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Button Styling from Original App */
+.button {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button-primary {
+  background: #fff;
+  color: #000;
+}
+
+.button-primary:hover:not(:disabled) {
+  background: #e5e5e5;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.button-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.button-danger {
+  background: #ff3040;
+  color: white;
+}
+
+.button-danger:hover:not(:disabled) {
+  background: #ff1a2b;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.button-secondary {
+  background: #2a2a2a;
+  color: #f5f5f5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
