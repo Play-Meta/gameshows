@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
+import { useGame } from '@/contexts/GameContext';
 
 interface VideoPlayerProps {
   src: string;
@@ -11,6 +12,7 @@ interface VideoPlayerProps {
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, onEnded, className = '', poster }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { isMuted } = useGame();
 
   useEffect(() => {
     const video = videoRef.current;
@@ -27,6 +29,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, onEnded, className = '',
     }
   }, [src]);
 
+  // Update video muted state when global mute changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = isMuted;
+    }
+  }, [isMuted]);
+
   return (
     <video
       ref={videoRef}
@@ -34,7 +44,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, onEnded, className = '',
       onEnded={onEnded}
       className={`video-fullscreen ${className}`}
       playsInline
-      muted={false}
+      muted={isMuted}
       autoPlay
       poster={poster}
     />

@@ -16,6 +16,7 @@ import EliminatedScreen from '@/components/EliminatedScreen';
 import WrapUpVideo from '@/components/WrapUpVideo';
 import CloserVideo from '@/components/CloserVideo';
 import WinnerScreen from '@/components/WinnerScreen';
+import RealtimeCommentSection from '@/components/RealtimeCommentSection';
 
 function GameContent() {
   const { gameState } = useGame();
@@ -25,6 +26,7 @@ function GameContent() {
       <Header />
       <DevToolbar />
       <MobilePhoneFrame>
+        {/* Game screens */}
         {gameState === 'waiting' && <WaitingRoom />}
         {gameState === 'countdown' && <Countdown />}
         {gameState === 'opener' && <OpenerVideo />}
@@ -36,6 +38,9 @@ function GameContent() {
         {gameState === 'wrapup' && <WrapUpVideo />}
         {gameState === 'closer' && <CloserVideo />}
         {gameState === 'winner' && <WinnerScreen />}
+        
+        {/* Realtime comment section with feed and composer */}
+        <RealtimeCommentSection />
       </MobilePhoneFrame>
     </>
   );

@@ -1,32 +1,37 @@
 'use client';
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef } from 'react';
 import { Howl } from 'howler';
 
 type SoundName = 'wake' | 'unwake' | 'mute' | 'click' | 'countdown' | 'bgMusic';
 
 export function useSound() {
-  // Pre-load audio files using Howler.js for better performance
+  // Use ref to store audio cache to avoid recreating on every render
+  const audioCacheRef = useRef<Record<string, Howl>>({});
+  const bgMusicLoadedRef = useRef(false);
+
+  // Pre-load only small, frequently used audio files
+  // Large files like background music are loaded on-demand
   const audioCache = useMemo(() => {
     if (typeof window === 'undefined') return {};
     
     const cache: Record<string, Howl> = {};
-    const soundFiles: Record<string, { src: string; volume: number; loop?: boolean }> = {
-      'wake': { src: '/sounds/Wake_Mobile.mp3', volume: 0.7 },
-      'unwake': { src: '/sounds/Inactive_Mobile.mp3', volume: 0.7 },
-      'mute': { src: '/sounds/Mute.mp3', volume: 0.7 },
-      'click': { src: '/sounds/Click-Warm.mp3', volume: 0.7 },
-      'countdown': { src: '/sounds/SecondCounter.mp3', volume: 0.7 },
-      'bgMusic': { src: '/sounds/gameshow-background.m4a', volume: 0.21, loop: true }
+    
+    // Only preload small sound effects (< 50KB total)
+    const soundFiles: Record<string, { src: string; volume: number; preload: boolean }> = {
+      'wake': { src: '/sounds/Wake_Mobile.mp3', volume: 0.7, preload: true },
+      'unwake': { src: '/sounds/Inactive_Mobile.mp3', volume: 0.7, preload: true },
+      'mute': { src: '/sounds/Mute.mp3', volume: 0.7, preload: true },
+      'click': { src: '/sounds/Click-Warm.mp3', volume: 0.7, preload: true },
+      'countdown': { src: '/sounds/SecondCounter.mp3', volume: 0.7, preload: true },
     };
 
     Object.entries(soundFiles).forEach(([key, config]) => {
       cache[key] = new Howl({
         src: [config.src],
         volume: config.volume,
-        loop: config.loop || false,
-        preload: true,
-        html5: key === 'bgMusic', // Use HTML5 for background music to save memory
+        preload: config.preload,
+        html5: false, // Use Web Audio API for small sound effects
         onloaderror: (id, error) => {
           console.debug(`🔊 Failed to load ${key}:`, error);
         },
@@ -36,12 +41,46 @@ export function useSound() {
       });
     });
 
+    audioCacheRef.current = cache;
     return cache;
+  }, []);
+
+  // Lazy load background music on first play attempt
+  const loadBackgroundMusic = useCallback(() => {
+    if (bgMusicLoadedRef.current || audioCacheRef.current['bgMusic']) {
+      return;
+    }
+
+    bgMusicLoadedRef.current = true;
+    
+    // Use the optimized MP3 file (3.2MB - half the size of original)
+    // Enable HTML5 Audio for streaming (doesn't need to fully download first)
+    audioCacheRef.current['bgMusic'] = new Howl({
+      src: ['/sounds/Dance-Music-Thump-by-lalalai.mp3'],
+      volume: 0.21,
+      loop: true,
+      preload: false, // Don't preload - load on demand
+      html5: true, // Use HTML5 Audio for streaming large files
+      onload: () => {
+        console.log('🎵 Background music loaded');
+      },
+      onloaderror: (id, error) => {
+        console.debug('🔊 Failed to load background music:', error);
+      },
+      onplayerror: (id, error) => {
+        console.debug('🔊 Failed to play background music:', error);
+      }
+    });
   }, []);
 
   const playSound = useCallback((soundName: SoundName, options?: { fadeIn?: boolean }) => {
     try {
-      const howl = audioCache[soundName];
+      // Lazy load background music on first play
+      if (soundName === 'bgMusic') {
+        loadBackgroundMusic();
+      }
+
+      const howl = audioCacheRef.current[soundName];
       if (!howl) {
         console.warn(`🔊 Sound ${soundName} not found in cache`);
         return;
@@ -52,8 +91,10 @@ export function useSound() {
         return;
       }
 
-      // Stop any currently playing instance
-      howl.stop();
+      // Stop any currently playing instance (except for background music)
+      if (soundName !== 'bgMusic') {
+        howl.stop();
+      }
       
       // Fade in background music over 3 seconds
       if (soundName === 'bgMusic' && options?.fadeIn) {
@@ -66,11 +107,11 @@ export function useSound() {
     } catch (error) {
       console.debug(`🔊 Sound error for ${soundName}:`, error);
     }
-  }, [audioCache]);
+  }, [loadBackgroundMusic]);
 
   const stopSound = useCallback((soundName: SoundName) => {
     try {
-      const howl = audioCache[soundName];
+      const howl = audioCacheRef.current[soundName];
       if (!howl) {
         console.warn(`🔊 Sound ${soundName} not found in cache`);
         return;
@@ -79,7 +120,7 @@ export function useSound() {
     } catch (error) {
       console.debug(`🔊 Sound stop error for ${soundName}:`, error);
     }
-  }, [audioCache]);
+  }, []);
 
   return { playSound, stopSound };
 }

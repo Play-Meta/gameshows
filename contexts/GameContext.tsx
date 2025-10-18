@@ -23,6 +23,7 @@ interface GameContextType {
   selectedAnswer: number | null;
   isCorrect: boolean | null;
   playerCount: number;
+  isMuted: boolean;
   
   startGame: () => void;
   startCountdown: () => void;
@@ -38,6 +39,7 @@ interface GameContextType {
   skipToFirstQuestion: () => void;
   skipToQuestion: (questionIndex: number) => void;
   skipToQuestionAnswer: (questionIndex: number) => void;
+  toggleMute: () => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -48,6 +50,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [playerCount] = useState(1234); // Simulated player count for prototype
+  const [isMuted, setIsMuted] = useState(false);
 
   const currentQuestion = QUESTIONS[currentQuestionIndex] || null;
 
@@ -148,6 +151,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const toggleMute = useCallback(() => {
+    setIsMuted(prev => !prev);
+  }, []);
+
   return (
     <GameContext.Provider
       value={{
@@ -157,6 +164,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         selectedAnswer,
         isCorrect,
         playerCount,
+        isMuted,
         startGame,
         startCountdown,
         playOpener,
@@ -171,6 +179,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         skipToFirstQuestion,
         skipToQuestion,
         skipToQuestionAnswer,
+        toggleMute,
       }}
     >
       {children}

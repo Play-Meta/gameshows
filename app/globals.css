@@ -96,6 +96,45 @@
   }
 }
 
+@keyframes floatUp {
+  0% {
+    transform: translateX(-50%) translateY(100vh);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(-60vh);
+    opacity: 0;
+  }
+}
+
+@keyframes commentFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hide scrollbar completely but keep scroll functionality */
+.comments-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scroll-behavior: smooth;
+}
+
+.comments-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 /* Optimistic Text Font Faces */
 @font-face {
   font-family: 'Optimistic Text';

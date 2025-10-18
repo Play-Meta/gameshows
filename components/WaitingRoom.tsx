@@ -16,8 +16,8 @@ const WaitingRoom: React.FC = () => {
   useEffect(() => {
     // Try to autoplay, but browsers may block this
     const tryPlayMusic = () => {
-      console.log('🎵 Attempting to play background music with fade-in...');
-      playSound('bgMusic', { fadeIn: true });
+      console.log('🎵 Attempting to play background music...');
+      playSound('bgMusic');
     };
 
     // Try immediately
@@ -78,7 +78,7 @@ const WaitingRoom: React.FC = () => {
 
   const handleStart = () => {
     // Ensure music is playing when user clicks Start
-    playSound('bgMusic', { fadeIn: true });
+    playSound('bgMusic');
     playSound('click');
     startGame();
   };
