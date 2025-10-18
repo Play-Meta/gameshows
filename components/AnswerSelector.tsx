@@ -47,7 +47,7 @@ const AnswerSelector: React.FC = () => {
   return (
     <div className="relative flex flex-col h-full">
       {/* Blurred video background */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden z-30">
         <video
           src={currentQuestion.videoUrl}
           className="video-blur-background"
@@ -57,7 +57,7 @@ const AnswerSelector: React.FC = () => {
       </div>
 
       {/* iOS Sheet Container - slides up from bottom */}
-      <div className="absolute inset-0 flex items-center justify-center p-6">
+      <div className="absolute inset-0 flex items-center justify-center p-6 z-50">
         <div className="w-full max-w-md animate-sheet-slide-up">
           {/* Sheet Content */}
           <div className="bg-black/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-white/10">
@@ -87,7 +87,7 @@ const AnswerSelector: React.FC = () => {
 
               {/* Question Text */}
               <div className="text-center mb-6">
-                <h2 className="text-xl font-bold text-white leading-tight">
+                <h2 className="text-base font-bold text-white leading-tight">
                   {currentQuestion.question}
                 </h2>
               </div>

@@ -23,7 +23,7 @@ export function useSound() {
       'unwake': { src: '/sounds/Inactive_Mobile.mp3', volume: 0.7, preload: true },
       'mute': { src: '/sounds/Mute.mp3', volume: 0.7, preload: true },
       'click': { src: '/sounds/Click-Warm.mp3', volume: 0.7, preload: true },
-      'countdown': { src: '/sounds/SecondCounter.mp3', volume: 0.7, preload: true },
+      'countdown': { src: '/sounds/SecondCounter.mp3', volume: 0.175, preload: true },
     };
 
     Object.entries(soundFiles).forEach(([key, config]) => {

@@ -20,7 +20,7 @@ const Pill: React.FC<PillProps> = ({
 }) => {
   // Size variants
   const sizeClasses = {
-    sm: 'px-2 py-1',
+    sm: 'px-2 pt-0.5 pb-1',
     lg: 'px-3 py-1.5'
   };
 

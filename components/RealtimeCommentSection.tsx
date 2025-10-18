@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useGame } from '@/contexts/GameContext';
 import CommentComposer from './CommentComposer';
 
 interface Comment {
@@ -45,9 +46,15 @@ const getUsernameColor = (username: string): string => {
 };
 
 const RealtimeCommentSection: React.FC = () => {
+  const { gameState } = useGame();
   const [comments, setComments] = useState<Comment[]>([]);
   const commentIndexRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Shrink comment section during question/answering states
+  const isQuestionActive = gameState === 'question-video' || gameState === 'answering';
+  const maxHeight = isQuestionActive ? 'max-h-[25%]' : 'max-h-[33%]';
+  const zIndex = isQuestionActive ? 'z-40' : 'z-50';
 
   useEffect(() => {
     // Add initial comment immediately
@@ -111,11 +118,11 @@ const RealtimeCommentSection: React.FC = () => {
   }, []);
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-50 flex flex-col justify-end">
+    <div className={`absolute inset-0 pointer-events-none ${zIndex} flex flex-col justify-end`} style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif' }}>
       {/* Comments feed - scrollable section */}
       <div 
         ref={containerRef}
-        className="comments-scrollbar relative w-full max-h-[33%] overflow-y-auto pointer-events-auto pb-16"
+        className={`comments-scrollbar relative w-full ${maxHeight} overflow-y-auto pointer-events-auto pb-[66px] transition-all duration-500 ease-out`}
         style={{
           background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)',
           maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 100%)',

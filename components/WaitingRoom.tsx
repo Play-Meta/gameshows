@@ -82,7 +82,7 @@ const WaitingRoom: React.FC = () => {
         />
 
         {/* Player Count */}
-        <div className="text-center flex flex-col items-center gap-1">
+        <div className="text-center flex flex-col items-center gap-1" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif' }}>
           <div className="text-xs tracking-wider">
             <SlotCounter 
               value={playerCount.toLocaleString()}
