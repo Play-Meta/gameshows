@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { GrainGradient } from '@paper-design/shaders-react';
 import { GameProvider, useGame } from '@/contexts/GameContext';
 import MobilePhoneFrame from '@/components/MobilePhoneFrame';
 import Header from '@/components/Header';
@@ -22,12 +23,36 @@ import RealtimeCommentSection from '@/components/RealtimeCommentSection';
 
 function GameContent() {
   const { gameState } = useGame();
+  
+  // Show persistent gradient background for waiting and countdown states
+  const showGradientBackground = gameState === 'waiting' || gameState === 'countdown';
 
   return (
     <>
       <Header />
       <DevToolbar />
       <MobilePhoneFrame>
+        {/* Persistent Grain Gradient Background for waiting/countdown */}
+        {showGradientBackground && (
+          <div className="absolute inset-0 z-0">
+            <GrainGradient
+              width={390}
+              height={844}
+              colors={["#fe1b35", "#d100c3", "#7538fa"]}
+              colorBack="#000a0f"
+              softness={0.70}
+              intensity={0.15}
+              noise={0.07}
+              shape="wave"
+              speed={1.2}
+              scale={0.65}
+              rotation={0}
+              offsetX={0.00}
+              offsetY={0.15}
+            />
+          </div>
+        )}
+        
         {/* Show Identity - persists across all views */}
         <ShowIdentity />
         

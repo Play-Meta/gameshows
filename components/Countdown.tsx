@@ -71,8 +71,9 @@ const Countdown: React.FC = () => {
   }, [count, playOpener, playSound]);
 
   return (
-    <div className="flex items-center justify-center h-full bg-gradient-to-b from-black via-purple-950 to-black">
-      <div className="text-center">
+    <div className="relative flex items-center justify-center h-full overflow-hidden">
+      {/* Content Layer */}
+      <div className="relative z-10 text-center">
         {/* Number Image - Half size (160px) */}
         <div className="relative w-40 h-40 mb-8 mx-auto">
           {count !== null && (
@@ -87,7 +88,7 @@ const Countdown: React.FC = () => {
           )}
         </div>
         
-        <div className="text-xl text-purple-300 uppercase tracking-widest">
+        <div className="text-xl text-white/70 uppercase tracking-widest">
           Get Ready
         </div>
       </div>

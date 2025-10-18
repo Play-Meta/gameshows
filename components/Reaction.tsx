@@ -117,7 +117,7 @@ const FlyingSymbol: React.FC<FlyingSymbolProps> = ({
   gradient,
   position,
   rotate = () => Math.random() * 90 - 45,
-  x = () => `${Math.random() * 200 - 100}%`,
+  x = () => `${Math.random() * 1596 - 798}%`, // Increased range by 33%: -798% to +798% for more slithering
   y = "-2000%", // Increased to -2000% (2x higher on screen)
   scale = 1.5,
 }) => {
@@ -136,7 +136,7 @@ const FlyingSymbol: React.FC<FlyingSymbolProps> = ({
       initial={{ y: 0, opacity: 1, scale: 1, rotate: 0, x: 0 }}
       animate={{ y, opacity: 0, scale, ...animate }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 2.5, ease: "easeOut" }} // Increased from 1s to 2.5s for slower, more graceful animation
+      transition={{ duration: 2.5, ease: "easeOut" }}
       className="fixed pointer-events-none z-[9999]"
       style={{ 
         width: '24px', 
