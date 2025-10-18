@@ -25,7 +25,7 @@ const CommentComposer: React.FC = () => {
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 pointer-events-auto px-4 pb-6 pt-3">
+    <div className="absolute bottom-0 left-0 right-0 pointer-events-auto px-3 pb-6 pt-3">
       <div className="flex items-center gap-0">
         {/* Text Input */}
         <input

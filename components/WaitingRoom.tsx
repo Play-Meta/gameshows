@@ -94,7 +94,7 @@ const WaitingRoom: React.FC = () => {
               separatorClassName="text-white"
             />
           </div>
-          <div className="text-xs text-white/70 tracking-wider">
+          <div className="text-xs text-white tracking-wider">
             Players Waiting
           </div>
         </div>

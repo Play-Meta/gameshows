@@ -2,10 +2,12 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'motion/react';
 import { useGame } from '@/contexts/GameContext';
+import Pill from './Pill';
 
 const ShowIdentity: React.FC = () => {
-  const { playerCount } = useGame();
+  const { playerCount, gameState } = useGame();
 
   // Format number with K abbreviation
   const formatViewerCount = (count: number): string => {
@@ -16,8 +18,11 @@ const ShowIdentity: React.FC = () => {
     return count.toString();
   };
 
+  // Show viewer count after game starts (not on waiting screen)
+  const showViewerCount = gameState !== 'waiting';
+
   return (
-    <div className="absolute top-16 left-0 right-0 z-50 px-4">
+    <div className="absolute top-16 left-0 right-0 z-50 px-3" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif' }}>
       <div className="flex items-center gap-2">
         {/* CNN Avatar */}
         <Image 
@@ -29,46 +34,71 @@ const ShowIdentity: React.FC = () => {
         />
 
         {/* Show/Host Info */}
-        <div className="flex items-center gap-1 text-white min-w-0 flex-1">
-          <Image 
-            src="/icon-microphone.png" 
-            alt="Host" 
-            width={12} 
-            height={12}
-            className="opacity-80 flex-shrink-0"
-          />
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          {/* Channel Name */}
           <div className="flex items-center gap-1">
-            <span className="text-xs font-medium flex-shrink-0">Host</span>
-            <span className="text-xs opacity-60 flex-shrink-0">·</span>
-            <span className="text-xs font-medium truncate">Anthony Bourdain</span>
+            <span className="text-xs font-semibold truncate">CNN</span>
+            <Image 
+              src="/icon-badge-verified.png" 
+              alt="Verified" 
+              width={12} 
+              height={12}
+              className="flex-shrink-0"
+            />
           </div>
-          <Image 
-            src="/icon-chevron-right.png" 
-            alt="" 
-            width={12} 
-            height={12}
-            className="opacity-60 flex-shrink-0"
-          />
+          
+          {/* Host Info */}
+          <div className="flex items-center gap-1 text-white">
+            <Image 
+              src="/icon-microphone.png" 
+              alt="Host" 
+              width={10} 
+              height={10}
+              className="opacity-80 flex-shrink-0"
+            />
+            <div className="flex items-center gap-1">
+              <span className="text-xs font-medium flex-shrink-0">Host</span>
+              <span className="text-xs opacity-60 flex-shrink-0">·</span>
+              <span className="text-xs font-medium truncate">Anthony Bourdain</span>
+            </div>
+            <Image 
+              src="/icon-chevron-right.png" 
+              alt="" 
+              width={12} 
+              height={12}
+              className="opacity-60 flex-shrink-0"
+            />
+          </div>
         </div>
 
         {/* Live Indicator */}
-        <div className="bg-red-600 px-2 pb-0.5 rounded-full line-height-0">
-          <span className="text-white text-xs line-height-0 font-bold tracking-wide">Live</span>
-        </div>
+        <Pill type="alert" size="sm">
+          Live
+        </Pill>
 
-        {/* Viewer Count */}
-        <div className="flex items-center gap-1 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-full">
-          <Image 
-            src="/icon-eye.png" 
-            alt="Viewers" 
-            width={16} 
-            height={16}
-            className="opacity-80"
-          />
-          <span className="text-white text-xs font-semibold">
-            {formatViewerCount(playerCount)}
-          </span>
-        </div>
+        {/* Viewer Count - Animated entrance */}
+        <AnimatePresence>
+          {showViewerCount && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, x: -10 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.8, x: -10 }}
+              transition={{ 
+                duration: 0.4, 
+                ease: [0.34, 1.56, 0.64, 1] // Nice bounce easing
+              }}
+            >
+              <Pill 
+                type="default" 
+                size="sm" 
+                icon="/icon-eye.png"
+                iconAlt="Viewers"
+              >
+                {formatViewerCount(playerCount)}
+              </Pill>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -123,7 +123,7 @@ const RealtimeCommentSection: React.FC = () => {
         }}
       >
         {/* Comment list - padded inside */}
-        <div className="px-4 py-4" style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+        <div className="px-3 py-4" style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
           {comments.map((comment) => (
             <div
               key={comment.key}
