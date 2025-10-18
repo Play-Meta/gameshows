@@ -5,7 +5,7 @@ import { useGame } from '@/contexts/GameContext';
 import { useSound } from '@/hooks/useSound';
 
 const AnswerSelector: React.FC = () => {
-  const { currentQuestion, selectAnswer, selectedAnswer } = useGame();
+  const { currentQuestion, selectAnswer, selectedAnswer, isEliminated, nextQuestion } = useGame();
   const { playSound } = useSound();
   const [timeLeft, setTimeLeft] = useState(currentQuestion?.timeLimit || 7);
   const lastPlayedSecondRef = useRef<number | null>(null);
@@ -30,14 +30,23 @@ const AnswerSelector: React.FC = () => {
         setTimeLeft(timeLeft - 1);
       }, 1000);
       return () => clearTimeout(timer);
-    } else {
-      // Time's up - auto-select wrong answer to eliminate player
-      selectAnswer(-1); // Invalid answer = elimination
     }
-  }, [timeLeft, selectedAnswer, selectAnswer, playSound]);
+    
+    // Time's up - handle differently for eliminated vs active players
+    if (!isEliminated) {
+      // Auto-select wrong answer to eliminate player
+      selectAnswer(-1);
+    } else {
+      // For eliminated players, auto-advance after brief delay
+      const advanceTimer = setTimeout(() => {
+        nextQuestion();
+      }, 2000);
+      return () => clearTimeout(advanceTimer);
+    }
+  }, [timeLeft, selectedAnswer, selectAnswer, playSound, isEliminated, nextQuestion]);
 
   const handleAnswerClick = (index: number) => {
-    if (selectedAnswer !== null) return; // Already selected
+    if (selectedAnswer !== null || isEliminated) return; // Already selected or eliminated
     playSound('click');
     selectAnswer(index);
   };
@@ -101,14 +110,14 @@ const AnswerSelector: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => handleAnswerClick(index)}
-                      disabled={selectedAnswer !== null}
+                      disabled={selectedAnswer !== null || isEliminated}
                       className={`
                         button w-full py-4 px-6 rounded-2xl font-semibold text-base
                         ${isSelected 
                           ? 'bg-blue-500 text-white scale-105 shadow-2xl' 
                           : 'button-secondary bg-white/90 backdrop-blur-md text-black hover:bg-white border-2 border-white/30'
                         }
-                        ${selectedAnswer !== null && !isSelected ? 'opacity-50' : ''}
+                        ${(selectedAnswer !== null || isEliminated) && !isSelected ? 'opacity-50' : ''}
                       `}
                     >
                       <div className="flex items-center justify-between">

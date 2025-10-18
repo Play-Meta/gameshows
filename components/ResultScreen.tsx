@@ -12,12 +12,15 @@ const ResultScreen: React.FC = () => {
   useEffect(() => {
     if (isCorrect) {
       playSound('wake');
-      // Show result for configured duration, then move to next question
-      const timer = setTimeout(() => {
-        nextQuestion();
-      }, GAME_CONFIG.resultDisplayDuration * 1000);
-      return () => clearTimeout(timer);
     }
+    
+    // Auto-advance for both correct answers and eliminated players
+    // Show result for configured duration, then move to next question
+    const timer = setTimeout(() => {
+      nextQuestion();
+    }, GAME_CONFIG.resultDisplayDuration * 1000);
+    
+    return () => clearTimeout(timer);
   }, [isCorrect, nextQuestion, playSound]);
 
   if (isCorrect === null) return null;
@@ -41,7 +44,7 @@ const ResultScreen: React.FC = () => {
         <p className="text-xl text-white/80">
           {isCorrect 
             ? 'Moving on to the next question...' 
-            : 'You have been eliminated'}
+            : 'Follow along with the remaining questions'}
         </p>
       </div>
 

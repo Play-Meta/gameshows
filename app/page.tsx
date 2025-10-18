@@ -5,6 +5,7 @@ import { GameProvider, useGame } from '@/contexts/GameContext';
 import MobilePhoneFrame from '@/components/MobilePhoneFrame';
 import Header from '@/components/Header';
 import ShowIdentity from '@/components/ShowIdentity';
+import EliminatedBanner from '@/components/EliminatedBanner';
 import DevToolbar from '@/components/DevToolbar';
 import WaitingRoom from '@/components/WaitingRoom';
 import Countdown from '@/components/Countdown';
@@ -30,6 +31,9 @@ function GameContent() {
         {/* Show Identity - persists across all views */}
         <ShowIdentity />
         
+        {/* Eliminated Banner - shows when player is eliminated */}
+        <EliminatedBanner />
+        
         {/* Game screens */}
         {gameState === 'waiting' && <WaitingRoom />}
         {gameState === 'countdown' && <Countdown />}
@@ -38,7 +42,6 @@ function GameContent() {
         {gameState === 'question-video' && <QuestionPlayer />}
         {gameState === 'answering' && <AnswerSelector />}
         {gameState === 'result' && <ResultScreen />}
-        {gameState === 'eliminated' && <EliminatedScreen />}
         {gameState === 'wrapup' && <WrapUpVideo />}
         {gameState === 'closer' && <CloserVideo />}
         {gameState === 'winner' && <WinnerScreen />}

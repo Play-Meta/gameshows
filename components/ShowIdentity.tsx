@@ -34,7 +34,7 @@ const ShowIdentity: React.FC = () => {
         />
 
         {/* Show/Host Info */}
-        <div className="flex flex-col gap-1 min-w-0 flex-1">
+        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
           {/* Channel Name */}
           <div className="flex items-center gap-1">
             <span className="text-xs font-semibold truncate">CNN</span>
@@ -48,7 +48,7 @@ const ShowIdentity: React.FC = () => {
           </div>
           
           {/* Host Info */}
-          <div className="flex items-center gap-1 text-white">
+          <div className="flex items-center gap-0.5 text-white">
             <Image 
               src="/icon-microphone.png" 
               alt="Host" 
@@ -56,7 +56,7 @@ const ShowIdentity: React.FC = () => {
               height={10}
               className="opacity-80 flex-shrink-0"
             />
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
               <span className="text-xs font-medium flex-shrink-0">Host</span>
               <span className="text-xs opacity-60 flex-shrink-0">·</span>
               <span className="text-xs font-medium truncate">Anthony Bourdain</span>

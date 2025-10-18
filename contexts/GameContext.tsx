@@ -24,6 +24,7 @@ interface GameContextType {
   isCorrect: boolean | null;
   playerCount: number;
   isMuted: boolean;
+  isEliminated: boolean;
   
   startGame: () => void;
   startCountdown: () => void;
@@ -51,6 +52,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [playerCount, setPlayerCount] = useState(500); // Start at 500 and animate
   const [isMuted, setIsMuted] = useState(false);
+  const [isEliminated, setIsEliminated] = useState(false);
 
   // Animate player count with phased growth
   useEffect(() => {
@@ -116,7 +118,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const selectAnswer = useCallback((answerIndex: number) => {
-    if (gameState !== 'answering') return;
+    if (gameState !== 'answering' || isEliminated) return;
     
     setSelectedAnswer(answerIndex);
     const correct = answerIndex === currentQuestion?.correctAnswer;
@@ -125,9 +127,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (correct) {
       setGameState('result');
     } else {
-      setGameState('eliminated');
+      setIsEliminated(true); // Mark player as eliminated
+      setGameState('result'); // Show result screen instead of eliminated screen
     }
-  }, [gameState, currentQuestion]);
+  }, [gameState, currentQuestion, isEliminated]);
 
   const nextQuestion = useCallback(() => {
     const nextIndex = currentQuestionIndex + 1;
@@ -156,6 +159,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setIsCorrect(null);
+    setIsEliminated(false);
   }, []);
 
   // Dev helper to skip to first question
@@ -200,6 +204,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         isCorrect,
         playerCount,
         isMuted,
+        isEliminated,
         startGame,
         startCountdown,
         playOpener,
