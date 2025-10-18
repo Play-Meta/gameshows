@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 
 // Rainbow colors from the comment section username colors
@@ -41,6 +42,7 @@ type Props = React.ComponentPropsWithoutRef<"button"> & {
 interface FlyingSymbol {
   id: number;
   gradient: [string, string];
+  position: { left: number; top: number };
 }
 
 export const Reaction: React.FC<Props> = ({
@@ -50,6 +52,12 @@ export const Reaction: React.FC<Props> = ({
   ...props
 }) => {
   const [flyingSymbols, setFlyingSymbols] = useState<FlyingSymbol[]>([]);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const onClick: React.MouseEventHandler<HTMLButtonElement> = useCallback(
     (e) => {
@@ -58,7 +66,14 @@ export const Reaction: React.FC<Props> = ({
       const id = Date.now() + Math.random(); // Ensure unique ID
       const gradient = GRADIENT_COMBOS[Math.floor(Math.random() * GRADIENT_COMBOS.length)] as [string, string];
       
-      setFlyingSymbols((flyingSymbols) => [...flyingSymbols, { id, gradient }]);
+      // Get button position for positioning hearts
+      const rect = buttonRef.current?.getBoundingClientRect();
+      const position = rect ? {
+        left: rect.left + rect.width / 2,
+        top: rect.top + rect.height / 2,
+      } : { left: 0, top: 0 };
+      
+      setFlyingSymbols((flyingSymbols) => [...flyingSymbols, { id, gradient, position }]);
       setTimeout(() => {
         setFlyingSymbols((flyingSymbols) =>
           flyingSymbols.filter((e) => e.id !== id)
@@ -69,26 +84,28 @@ export const Reaction: React.FC<Props> = ({
   );
 
   return (
-    <div className="relative inline-flex">
-      <button {...{ onClick, ...props }}>
+    <>
+      <button ref={buttonRef} {...{ onClick, ...props }}>
         {children || symbol}
       </button>
       
-      {/* Render flying hearts outside button to avoid inheriting button's scale transforms */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Portal flying hearts to document body to escape z-index stacking contexts */}
+      {mounted && createPortal(
         <AnimatePresence>
-          {flyingSymbols.map(({ id, gradient }) => (
-            <FlyingSymbol key={id} id={id} gradient={gradient} />
+          {flyingSymbols.map(({ id, gradient, position }) => (
+            <FlyingSymbol key={id} id={id} gradient={gradient} position={position} />
           ))}
-        </AnimatePresence>
-      </div>
-    </div>
+        </AnimatePresence>,
+        document.body
+      )}
+    </>
   );
 };
 
 interface FlyingSymbolProps {
   id: number;
   gradient: [string, string];
+  position: { left: number; top: number };
   rotate?: number | (() => number);
   x?: string | number | (() => string | number);
   y?: string;
@@ -98,6 +115,7 @@ interface FlyingSymbolProps {
 const FlyingSymbol: React.FC<FlyingSymbolProps> = ({
   id,
   gradient,
+  position,
   rotate = () => Math.random() * 90 - 45,
   x = () => `${Math.random() * 200 - 100}%`,
   y = "-2000%", // Increased to -2000% (2x higher on screen)
@@ -119,14 +137,23 @@ const FlyingSymbol: React.FC<FlyingSymbolProps> = ({
       animate={{ y, opacity: 0, scale, ...animate }}
       exit={{ opacity: 0 }}
       transition={{ duration: 2.5, ease: "easeOut" }} // Increased from 1s to 2.5s for slower, more graceful animation
-      className="absolute pointer-events-none"
-      style={{ width: '24px', height: '24px' }}
+      className="fixed pointer-events-none z-[9999]"
+      style={{ 
+        width: '24px', 
+        height: '24px',
+        left: position.left - 12, // Center horizontally (half of 24px)
+        top: position.top - 12, // Center vertically (half of 24px)
+      }}
     >
       <svg
         width="24"
         height="24"
         viewBox="0 0 24 24"
         fill={`url(#${gradientId})`}
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>

@@ -31,7 +31,7 @@ const Pill: React.FC<PillProps> = ({
   };
 
   // Icon size based on pill size
-  const iconSize = size === 'sm' ? 16 : 20;
+  const iconSize = size === 'sm' ? 12 : 20;
 
   return (
     <div className={`flex items-center gap-1 rounded-full ${sizeClasses[size]} ${typeClasses[type]}`}>

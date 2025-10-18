@@ -5,20 +5,22 @@ import { useGame } from '@/contexts/GameContext';
 import { useSound } from '@/hooks/useSound';
 
 const AnswerSelector: React.FC = () => {
-  const { currentQuestion, selectAnswer, selectedAnswer, isEliminated, nextQuestion } = useGame();
+  const { currentQuestion, selectAnswer, isEliminated } = useGame();
   const { playSound } = useSound();
   const [timeLeft, setTimeLeft] = useState(currentQuestion?.timeLimit || 7);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null); // Local state for locked answer
   const lastPlayedSecondRef = useRef<number | null>(null);
 
-  // Reset timer when question changes
+  // Reset timer and selection when question changes
   useEffect(() => {
     setTimeLeft(currentQuestion?.timeLimit || 7);
+    setSelectedAnswer(null); // Reset locked answer
     lastPlayedSecondRef.current = null; // Reset sound tracking
   }, [currentQuestion]);
 
   useEffect(() => {
-    if (selectedAnswer !== null) return; // Stop timer if answer selected
-
+    // Timer always runs - doesn't stop when answer is selected (realtime sync for all players)
+    
     // Play countdown sound for last 3 seconds (3, 2, 1)
     if (timeLeft <= 3 && timeLeft > 0 && lastPlayedSecondRef.current !== timeLeft) {
       playSound('countdown');
@@ -32,23 +34,24 @@ const AnswerSelector: React.FC = () => {
       return () => clearTimeout(timer);
     }
     
-    // Time's up - handle differently for eliminated vs active players
-    if (!isEliminated) {
-      // Auto-select wrong answer to eliminate player
+    // Time's up - now submit answers and show results for everyone simultaneously
+    if (selectedAnswer === null && !isEliminated) {
+      // No answer selected - auto-eliminate
       selectAnswer(-1);
     } else {
-      // For eliminated players, auto-advance after brief delay
+      // Answer was selected or player is eliminated - proceed to results
       const advanceTimer = setTimeout(() => {
-        nextQuestion();
-      }, 2000);
+        selectAnswer(selectedAnswer ?? -1); // Submit the selected answer (or -1 if eliminated)
+      }, 100);
       return () => clearTimeout(advanceTimer);
     }
-  }, [timeLeft, selectedAnswer, selectAnswer, playSound, isEliminated, nextQuestion]);
+  }, [timeLeft, selectedAnswer, selectAnswer, playSound, isEliminated]);
 
   const handleAnswerClick = (index: number) => {
     if (selectedAnswer !== null || isEliminated) return; // Already selected or eliminated
     playSound('click');
-    selectAnswer(index);
+    // Lock in the answer but don't submit yet - wait for timer
+    setSelectedAnswer(index);
   };
 
   if (!currentQuestion) return null;
@@ -66,8 +69,8 @@ const AnswerSelector: React.FC = () => {
       </div>
 
       {/* iOS Sheet Container - slides up from bottom */}
-      <div className="absolute inset-0 flex items-center justify-center p-6 z-50">
-        <div className="w-full max-w-md animate-sheet-slide-up">
+      <div className="absolute inset-0 flex items-center justify-center p-3 z-50 pointer-events-none">
+        <div className="w-full max-w-md animate-sheet-slide-up pointer-events-auto">
           {/* Sheet Content */}
           <div className="bg-black/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-white/10">
             {/* Timer Bar */}
@@ -84,7 +87,7 @@ const AnswerSelector: React.FC = () => {
             </div>
 
             {/* Content */}
-            <div className="p-6">
+            <div className="p-3">
               {/* Timer Display */}
               <div className="text-center mb-4">
                 <div className={`text-5xl font-bold ${
@@ -102,7 +105,7 @@ const AnswerSelector: React.FC = () => {
               </div>
 
               {/* Answer Options */}
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 {currentQuestion.options.map((option, index) => {
                   const isSelected = selectedAnswer === index;
                   
@@ -112,9 +115,9 @@ const AnswerSelector: React.FC = () => {
                       onClick={() => handleAnswerClick(index)}
                       disabled={selectedAnswer !== null || isEliminated}
                       className={`
-                        button w-full py-4 px-6 rounded-2xl font-semibold text-base
+                        button w-full py-4 px-6 rounded-3xl font-semibold text-base
                         ${isSelected 
-                          ? 'bg-blue-500 text-white scale-105 shadow-2xl' 
+                          ? 'bg-white text-black shadow-2xl border-2 border-white' 
                           : 'button-secondary bg-white/90 backdrop-blur-md text-black hover:bg-white border-2 border-white/30'
                         }
                         ${(selectedAnswer !== null || isEliminated) && !isSelected ? 'opacity-50' : ''}
@@ -123,7 +126,7 @@ const AnswerSelector: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-left flex-1">{option}</span>
                         {isSelected && (
-                          <span className="ml-2 text-2xl">✓</span>
+                          <span className="ml-2 text-base">✓</span>
                         )}
                       </div>
                     </button>
