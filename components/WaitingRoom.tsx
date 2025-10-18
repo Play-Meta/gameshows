@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import SlotCounter from 'react-slot-counter';
 import { GrainGradient } from '@paper-design/shaders-react';
@@ -8,9 +8,8 @@ import { useGame } from '@/contexts/GameContext';
 import { useSound } from '@/hooks/useSound';
 
 const WaitingRoom: React.FC = () => {
-  const { startGame } = useGame();
+  const { startGame, playerCount } = useGame();
   const { playSound, stopSound } = useSound();
-  const [animatedCount, setAnimatedCount] = useState(500); // Start at 500
 
   // Play background music on mount (with user interaction fallback)
   useEffect(() => {
@@ -40,41 +39,6 @@ const WaitingRoom: React.FC = () => {
       document.removeEventListener('touchstart', handleInteraction);
     };
   }, [playSound, stopSound]);
-
-  // Simulate players joining with phased growth
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-
-    const updateCount = () => {
-      setAnimatedCount(prev => {
-        // Phase 1: Rapid growth to 10K
-        if (prev < 10000) {
-          return prev + Math.floor(Math.random() * 200) + 100; // +100-300 per tick
-        }
-        // Phase 2: Slow growth around 10K
-        else if (prev < 12000) {
-          return prev + Math.floor(Math.random() * 20) + 5; // +5-25 per tick
-        }
-        // Phase 3: Jump to 25K
-        else if (prev < 25000) {
-          return 25000 + Math.floor(Math.random() * 100);
-        }
-        // Phase 4: Jump to 40K
-        else if (prev < 40000) {
-          return 40000 + Math.floor(Math.random() * 100);
-        }
-        // Phase 5: Settle around 40K
-        else {
-          return prev + Math.floor(Math.random() * 10) - 5; // Fluctuate ±5
-        }
-      });
-    };
-
-    // Start with faster updates, then slow down
-    intervalId = setInterval(updateCount, 800); // Update every 800ms
-
-    return () => clearInterval(intervalId);
-  }, []);
 
   const handleStart = () => {
     // Ensure music is playing when user clicks Start
@@ -106,30 +70,22 @@ const WaitingRoom: React.FC = () => {
 
       {/* Content Layer */}
       <div className="relative z-10 flex flex-col items-center justify-center gap-8">
-        {/* Game Logo */}
+        {/* Game Logo - Clickable to start game */}
         <Image 
-          src="/Shows.svg" 
+          src="/GameShowsLogo.svg" 
           alt="Gameshows" 
           width={120}
           height={48}
-          className="object-contain"
-          style={{ height: '48px', width: 'auto' }}
-        />
-
-        {/* Start Button */}
-        <button
+          className="object-contain cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95"
+          style={{ width: '120px', height: 'auto' }}
           onClick={handleStart}
-          className="button button-primary text-xl px-12 py-4 rounded-full shadow-2xl"
-          style={{ width: 'auto' }}
-        >
-          Start Game
-        </button>
+        />
 
         {/* Player Count */}
         <div className="text-center flex flex-col items-center gap-1">
           <div className="text-xs tracking-wider">
             <SlotCounter 
-              value={animatedCount.toLocaleString()}
+              value={playerCount.toLocaleString()}
               duration={0.5}
               speed={1.2}
               animateUnchanged={false}

@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Howler } from 'howler';
+import { Volume2, VolumeX } from 'lucide-react';
 import { useGame } from '@/contexts/GameContext';
 import DevButton from '@/components/DevButton';
 
@@ -106,7 +107,7 @@ const DevToolbar: React.FC = () => {
         title={isMuted ? "Unmute" : "Mute"}
         variant={isMuted ? 'muted' : 'default'}
       >
-        {isMuted ? '🔇' : '🔊'}
+        {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
       </DevButton>
 
       {/* Restart button */}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
 import { QUESTIONS, Question } from '@/config/questions';
 
 export type GameState = 
@@ -49,8 +49,43 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const [playerCount] = useState(1234); // Simulated player count for prototype
+  const [playerCount, setPlayerCount] = useState(500); // Start at 500 and animate
   const [isMuted, setIsMuted] = useState(false);
+
+  // Animate player count with phased growth
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    const updateCount = () => {
+      setPlayerCount(prev => {
+        // Phase 1: Rapid growth to 10K
+        if (prev < 10000) {
+          return prev + Math.floor(Math.random() * 200) + 100; // +100-300 per tick
+        }
+        // Phase 2: Slow growth around 10K
+        else if (prev < 12000) {
+          return prev + Math.floor(Math.random() * 20) + 5; // +5-25 per tick
+        }
+        // Phase 3: Jump to 25K
+        else if (prev < 25000) {
+          return 25000 + Math.floor(Math.random() * 100);
+        }
+        // Phase 4: Jump to 40K
+        else if (prev < 40000) {
+          return 40000 + Math.floor(Math.random() * 100);
+        }
+        // Phase 5: Settle around 40K
+        else {
+          return prev + Math.floor(Math.random() * 10) - 5; // Fluctuate ±5
+        }
+      });
+    };
+
+    // Start with faster updates, then slow down
+    intervalId = setInterval(updateCount, 800); // Update every 800ms
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   const currentQuestion = QUESTIONS[currentQuestionIndex] || null;
 

@@ -4,6 +4,7 @@ import React from 'react';
 import { GameProvider, useGame } from '@/contexts/GameContext';
 import MobilePhoneFrame from '@/components/MobilePhoneFrame';
 import Header from '@/components/Header';
+import ShowIdentity from '@/components/ShowIdentity';
 import DevToolbar from '@/components/DevToolbar';
 import WaitingRoom from '@/components/WaitingRoom';
 import Countdown from '@/components/Countdown';
@@ -26,6 +27,9 @@ function GameContent() {
       <Header />
       <DevToolbar />
       <MobilePhoneFrame>
+        {/* Show Identity - persists across all views */}
+        <ShowIdentity />
+        
         {/* Game screens */}
         {gameState === 'waiting' && <WaitingRoom />}
         {gameState === 'countdown' && <Countdown />}
