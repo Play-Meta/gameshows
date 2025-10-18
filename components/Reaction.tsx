@@ -27,7 +27,7 @@ const GRADIENT_COMBOS = [
   ['#30D158', '#BF5AF2'], // Green to Purple
   ['#64D2FF', '#FF375F'], // Blue to Pink
   ['#BF5AF2', '#FF9500'], // Purple to Orange
-];
+] as const;
 
 type Props = React.ComponentPropsWithoutRef<"button"> & {
   symbol?: string;
@@ -56,7 +56,7 @@ export const Reaction: React.FC<Props> = ({
       callback?.(e);
 
       const id = Date.now() + Math.random(); // Ensure unique ID
-      const gradient = GRADIENT_COMBOS[Math.floor(Math.random() * GRADIENT_COMBOS.length)];
+      const gradient = GRADIENT_COMBOS[Math.floor(Math.random() * GRADIENT_COMBOS.length)] as [string, string];
       
       setFlyingSymbols((flyingSymbols) => [...flyingSymbols, { id, gradient }]);
       setTimeout(() => {
