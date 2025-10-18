@@ -117,21 +117,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGameState('answering');
   }, []);
 
-  const selectAnswer = useCallback((answerIndex: number) => {
-    if (gameState !== 'answering' || isEliminated) return;
-    
-    setSelectedAnswer(answerIndex);
-    const correct = answerIndex === currentQuestion?.correctAnswer;
-    setIsCorrect(correct);
-    
-    if (correct) {
-      setGameState('result');
-    } else {
-      setIsEliminated(true); // Mark player as eliminated
-      setGameState('result'); // Show result screen instead of eliminated screen
-    }
-  }, [gameState, currentQuestion, isEliminated]);
-
   const nextQuestion = useCallback(() => {
     const nextIndex = currentQuestionIndex + 1;
     
@@ -145,6 +130,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setGameState('question-video');
     }
   }, [currentQuestionIndex]);
+
+  const selectAnswer = useCallback((answerIndex: number) => {
+    if (gameState !== 'answering') return;
+    
+    // If already eliminated, skip to next question (no result screen needed)
+    if (isEliminated) {
+      nextQuestion();
+      return;
+    }
+    
+    setSelectedAnswer(answerIndex);
+    const correct = answerIndex === currentQuestion?.correctAnswer;
+    setIsCorrect(correct);
+    
+    if (correct) {
+      setGameState('result');
+    } else {
+      setIsEliminated(true); // Mark player as eliminated
+      setGameState('result'); // Show result screen instead of eliminated screen
+    }
+  }, [gameState, currentQuestion, isEliminated, nextQuestion]);
 
   const playWrapUp = useCallback(() => {
     setGameState('wrapup');
