@@ -117,7 +117,7 @@ const FlyingSymbol: React.FC<FlyingSymbolProps> = ({
   gradient,
   position,
   rotate = () => Math.random() * 90 - 45,
-  x = () => `${Math.random() * 1596 - 798}%`, // Increased range by 33%: -798% to +798% for more slithering
+  x = () => `${Math.random() * 1200 - 600}%`, // Increased range: -600% to +600% for more slithering
   y = "-2000%", // Increased to -2000% (2x higher on screen)
   scale = 1.5,
 }) => {
