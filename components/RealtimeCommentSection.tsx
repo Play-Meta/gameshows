@@ -11,23 +11,10 @@ interface Comment {
   key: string;
 }
 
-const SAMPLE_COMMENTS = [
-  { id: '1', username: 'FoodieFan123', message: "Let's gooo! Bourdain for the win! 🔥" },
-  { id: '2', username: 'TravelBug_Tia', message: 'Just got back from Vietnam. The food was incredible! 🍜' },
-  { id: '3', username: 'ChefWannabe_Chad', message: "I'm definitely trying this at home." },
-  { id: '4', username: 'GlobalTrekker', message: 'I hope they travel somewhere amazing in this episode!' },
-  { id: '5', username: 'NoodleNinja', message: 'I could go for a giant bowl of ramen.' },
-  { id: '6', username: 'Anthro_Andy', message: "Bourdain's commentary is always so sharp. A true legend." },
-  { id: '7', username: 'StreetFoodSue', message: 'Anyone else getting hungry already? 🤤' },
-  { id: '8', username: 'SpicySi', message: 'That first contestant looks nervous lol' },
-  { id: '9', username: 'WorldMusicWalter', message: "What's the background music? It's a banger." },
-  { id: '10', username: 'DaringDiner', message: "I'd eat anything Bourdain put in front of me. No questions asked." },
-  { id: '11', username: 'GrillMaster_Gary', message: 'I bet I could win this show.' },
-  { id: '12', username: 'Hungry_Hank', message: 'I need a snack.' },
-  { id: '13', username: 'CynicalCynthia', message: "Let's see if these contestants actually know how to cook." },
-  { id: '14', username: 'Enthusiastic_Eva', message: "This is the best thing I've seen all week! 😍" },
-  { id: '15', username: 'PartsUnknownPro', message: "This show has big 'Parts Unknown' energy." },
-];
+interface RawComment {
+  username: string;
+  message: string;
+}
 
 // Apple rainbow colors with Gen Z saturation boost
 const USERNAME_COLORS = [
@@ -46,10 +33,28 @@ const getUsernameColor = (username: string): string => {
 };
 
 const RealtimeCommentSection: React.FC = () => {
-  const { gameState } = useGame();
+  const { gameState, currentQuiz } = useGame();
   const [comments, setComments] = useState<Comment[]>([]);
+  const [loadedComments, setLoadedComments] = useState<RawComment[]>([]);
   const commentIndexRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load comments from quiz-specific file
+  useEffect(() => {
+    const loadComments = async () => {
+      try {
+        const response = await fetch(currentQuiz.commentsFile);
+        const data: RawComment[] = await response.json();
+        setLoadedComments(data);
+      } catch (error) {
+        console.error('Failed to load comments:', error);
+        setLoadedComments([]);
+      }
+    };
+
+    loadComments();
+  }, [currentQuiz.commentsFile]);
 
   // Shrink comment section during question/answering states
   const isQuestionActive = gameState === 'question-video' || gameState === 'answering';
@@ -57,9 +62,24 @@ const RealtimeCommentSection: React.FC = () => {
   const zIndex = isQuestionActive ? 'z-40' : 'z-50';
 
   useEffect(() => {
+    // Reset comments when quiz changes or when comments are loaded
+    if (loadedComments.length === 0) return;
+
+    // Clear existing comments and intervals
+    setComments([]);
+    commentIndexRef.current = 0;
+    if (intervalRef.current) {
+      clearTimeout(intervalRef.current);
+    }
+
     // Add initial comment immediately
-    const firstComment = SAMPLE_COMMENTS[0];
-    setComments([{ ...firstComment, key: `${firstComment.id}-${Date.now()}` }]);
+    const firstComment = loadedComments[0];
+    setComments([{ 
+      id: '0', 
+      username: firstComment.username, 
+      message: firstComment.message, 
+      key: `0-${Date.now()}` 
+    }]);
     commentIndexRef.current = 1;
 
     // Add comments with extreme variable timing for realistic feel
@@ -80,13 +100,18 @@ const RealtimeCommentSection: React.FC = () => {
         randomDelay = 2000 + Math.random() * 2000;
       }
       
-      setTimeout(() => {
-        const comment = SAMPLE_COMMENTS[commentIndexRef.current % SAMPLE_COMMENTS.length];
-        const uniqueKey = `${comment.id}-${Date.now()}-${Math.random()}`;
+      const timeout = setTimeout(() => {
+        const rawComment = loadedComments[commentIndexRef.current % loadedComments.length];
+        const uniqueKey = `${commentIndexRef.current}-${Date.now()}-${Math.random()}`;
         
         setComments(prev => {
           // Keep all comments for full chronological history
-          const newComments = [...prev, { ...comment, key: uniqueKey }];
+          const newComments = [...prev, { 
+            id: commentIndexRef.current.toString(),
+            username: rawComment.username,
+            message: rawComment.message,
+            key: uniqueKey 
+          }];
           return newComments;
         });
         
@@ -105,17 +130,21 @@ const RealtimeCommentSection: React.FC = () => {
         }
 
         // Schedule the next comment
-        scheduleNextComment();
+        intervalRef.current = scheduleNextComment();
       }, randomDelay);
+
+      return timeout;
     };
 
     // Start the comment cycle
-    scheduleNextComment();
+    intervalRef.current = scheduleNextComment();
 
     return () => {
-      // Cleanup handled by component unmount
+      if (intervalRef.current) {
+        clearTimeout(intervalRef.current);
+      }
     };
-  }, []);
+  }, [loadedComments]);
 
   return (
     <div className={`absolute inset-0 pointer-events-none ${zIndex} flex flex-col justify-end`} style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif' }}>
@@ -146,7 +175,7 @@ const RealtimeCommentSection: React.FC = () => {
                 >
                   {comment.username}
                 </span>
-                <span className="mx-1.5 text-white/60">·</span>
+                <span className="mx-0.5 text-white/60"></span>
                 <span className="text-white drop-shadow-lg">{comment.message}</span>
               </div>
             </div>

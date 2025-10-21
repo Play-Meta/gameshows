@@ -1,18 +1,17 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
-import { QUESTIONS, Question } from '@/config/questions';
+import { QuizConfig, Question } from '@/config/quizzes';
+import { bourdainQuiz } from '@/config/quizzes';
 
 export type GameState = 
   | 'waiting'          // Waiting room before game starts
   | 'countdown'        // 3-2-1 countdown
-  | 'opener'           // Opener video (Bourdain rules intro)
   | 'intro'            // Intro video (transition to game)
   | 'question-video'   // Playing question video
   | 'answering'        // Showing answer options
+  | 'answer-video'     // Playing answer video after timer expires
   | 'result'           // Showing if player got it right/wrong
-  | 'eliminated'       // Player got question wrong
-  | 'wrapup'           // Wrap-up video after final question
   | 'closer'           // Closer video
   | 'winner';          // Player answered all questions correctly
 
@@ -25,18 +24,19 @@ interface GameContextType {
   playerCount: number;
   isMuted: boolean;
   isEliminated: boolean;
+  currentQuiz: QuizConfig;
   
   startGame: () => void;
   startCountdown: () => void;
-  playOpener: () => void;
   playIntro: () => void;
   playQuestionVideo: () => void;
   showAnswers: () => void;
+  playAnswerVideo: () => void;
   selectAnswer: (answerIndex: number) => void;
   nextQuestion: () => void;
-  playWrapUp: () => void;
   playCloser: () => void;
   restartGame: () => void;
+  setQuiz: (quiz: QuizConfig) => void;
   skipToFirstQuestion: () => void;
   skipToQuestion: (questionIndex: number) => void;
   skipToQuestionAnswer: (questionIndex: number) => void;
@@ -45,7 +45,12 @@ interface GameContextType {
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
-export function GameProvider({ children }: { children: ReactNode }) {
+interface GameProviderProps {
+  children: ReactNode;
+  initialQuiz?: QuizConfig;
+}
+
+export function GameProvider({ children, initialQuiz = bourdainQuiz }: GameProviderProps) {
   const [gameState, setGameState] = useState<GameState>('waiting');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -53,6 +58,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [playerCount, setPlayerCount] = useState(500); // Start at 500 and animate
   const [isMuted, setIsMuted] = useState(false);
   const [isEliminated, setIsEliminated] = useState(false);
+  const [currentQuiz, setCurrentQuiz] = useState<QuizConfig>(initialQuiz);
 
   // Animate player count with phased growth
   useEffect(() => {
@@ -89,7 +95,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(intervalId);
   }, []);
 
-  const currentQuestion = QUESTIONS[currentQuestionIndex] || null;
+  const currentQuestion = currentQuiz.questions[currentQuestionIndex] || null;
+
+  const setQuiz = useCallback((quiz: QuizConfig) => {
+    setCurrentQuiz(quiz);
+    setGameState('waiting');
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setIsCorrect(null);
+    setIsEliminated(false);
+  }, []);
 
   const startGame = useCallback(() => {
     setGameState('countdown');
@@ -97,10 +112,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const startCountdown = useCallback(() => {
     setGameState('countdown');
-  }, []);
-
-  const playOpener = useCallback(() => {
-    setGameState('opener');
   }, []);
 
   const playIntro = useCallback(() => {
@@ -117,19 +128,23 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGameState('answering');
   }, []);
 
+  const playAnswerVideo = useCallback(() => {
+    setGameState('answer-video');
+  }, []);
+
   const nextQuestion = useCallback(() => {
     const nextIndex = currentQuestionIndex + 1;
     
-    if (nextIndex >= QUESTIONS.length) {
-      // All questions completed - play wrap-up video
-      setGameState('wrapup');
+    if (nextIndex >= currentQuiz.questions.length) {
+      // All questions completed - play closer video
+      setGameState('closer');
     } else {
       setCurrentQuestionIndex(nextIndex);
       setSelectedAnswer(null);
       setIsCorrect(null);
       setGameState('question-video');
     }
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, currentQuiz.questions.length]);
 
   const selectAnswer = useCallback((answerIndex: number) => {
     if (gameState !== 'answering') return;
@@ -151,10 +166,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setGameState('result'); // Show result screen instead of eliminated screen
     }
   }, [gameState, currentQuestion, isEliminated, nextQuestion]);
-
-  const playWrapUp = useCallback(() => {
-    setGameState('wrapup');
-  }, []);
 
   const playCloser = useCallback(() => {
     setGameState('closer');
@@ -178,23 +189,23 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   // Dev helper to skip to any question
   const skipToQuestion = useCallback((questionIndex: number) => {
-    if (questionIndex >= 0 && questionIndex < QUESTIONS.length) {
+    if (questionIndex >= 0 && questionIndex < currentQuiz.questions.length) {
       setCurrentQuestionIndex(questionIndex);
       setSelectedAnswer(null);
       setIsCorrect(null);
       setGameState('question-video');
     }
-  }, []);
+  }, [currentQuiz.questions.length]);
 
   // Dev helper to skip to answering state for any question
   const skipToQuestionAnswer = useCallback((questionIndex: number) => {
-    if (questionIndex >= 0 && questionIndex < QUESTIONS.length) {
+    if (questionIndex >= 0 && questionIndex < currentQuiz.questions.length) {
       setCurrentQuestionIndex(questionIndex);
       setSelectedAnswer(null); // Reset answer so user can select
       setIsCorrect(null);
       setGameState('answering'); // Go to answering state, not result
     }
-  }, []);
+  }, [currentQuiz.questions.length]);
 
   const toggleMute = useCallback(() => {
     setIsMuted(prev => !prev);
@@ -211,17 +222,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
         playerCount,
         isMuted,
         isEliminated,
+        currentQuiz,
         startGame,
         startCountdown,
-        playOpener,
         playIntro,
         playQuestionVideo,
         showAnswers,
+        playAnswerVideo,
         selectAnswer,
         nextQuestion,
-        playWrapUp,
         playCloser,
         restartGame,
+        setQuiz,
         skipToFirstQuestion,
         skipToQuestion,
         skipToQuestionAnswer,

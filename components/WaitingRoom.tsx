@@ -2,12 +2,11 @@
 
 import React, { useEffect } from 'react';
 import Image from 'next/image';
-import SlotCounter from 'react-slot-counter';
 import { useGame } from '@/contexts/GameContext';
 import { useSound } from '@/hooks/useSound';
 
 const WaitingRoom: React.FC = () => {
-  const { startGame, playerCount } = useGame();
+  const { startGame } = useGame();
   const { playSound, stopSound } = useSound();
 
   // Play background music on mount (with user interaction fallback)
@@ -61,23 +60,13 @@ const WaitingRoom: React.FC = () => {
           onClick={handleStart}
         />
 
-        {/* Player Count */}
-        <div className="text-center flex flex-col items-center gap-1" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif' }}>
-          <div className="text-xs tracking-wider">
-            <SlotCounter 
-              value={playerCount.toLocaleString()}
-              duration={0.5}
-              speed={1.2}
-              animateUnchanged={false}
-              useMonospaceWidth={true}
-              charClassName="text-white font-bold"
-              separatorClassName="text-white"
-            />
-          </div>
-          <div className="text-xs text-white tracking-wider">
-            Players Waiting
-          </div>
-        </div>
+        {/* Start Button */}
+        <button
+          onClick={handleStart}
+          className="px-6 py-2 bg-white text-black text-sm font-semibold rounded-full transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-lg"
+        >
+          Start
+        </button>
       </div>
     </div>
   );

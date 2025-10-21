@@ -5,7 +5,7 @@ import { useGame } from '@/contexts/GameContext';
 import VideoPlayer from '@/components/VideoPlayer';
 
 const CloserVideo: React.FC = () => {
-  const { restartGame } = useGame();
+  const { restartGame, currentQuiz } = useGame();
 
   const handleVideoEnd = () => {
     console.log('Closer video ended, showing winner screen');
@@ -18,7 +18,7 @@ const CloserVideo: React.FC = () => {
   return (
     <div className="w-full h-full bg-black">
       <VideoPlayer 
-        src="/videos/GameShowCloser.mp4"
+        src={currentQuiz.videos.closer}
         onEnded={handleVideoEnd}
       />
     </div>

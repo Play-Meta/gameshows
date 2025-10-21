@@ -3,10 +3,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useSound } from '@/hooks/useSound';
-import { GAME_CONFIG } from '@/config/questions';
 
 const Countdown: React.FC = () => {
-  const { playOpener } = useGame();
+  const { playIntro, currentQuiz } = useGame();
   const { playSound } = useSound();
   const [count, setCount] = useState<number | null>(null); // Start with null
   const [isExiting, setIsExiting] = useState(false);
@@ -15,11 +14,11 @@ const Countdown: React.FC = () => {
   // Initial effect to show first number after 100ms
   useEffect(() => {
     const initialTimer = setTimeout(() => {
-      setCount(GAME_CONFIG.countdownDuration);
+      setCount(currentQuiz.timing.countdownDuration);
     }, 100);
     
     return () => clearTimeout(initialTimer);
-  }, []);
+  }, [currentQuiz.timing.countdownDuration]);
 
   useEffect(() => {
     if (count === null) return; // Don't do anything until we have a count
@@ -59,7 +58,7 @@ const Countdown: React.FC = () => {
       const gameTimer = setTimeout(() => {
         playSound('wake');
         setTimeout(() => {
-          playOpener();
+          playIntro();
         }, 300);
       }, 1000);
       
@@ -68,7 +67,7 @@ const Countdown: React.FC = () => {
         clearTimeout(gameTimer);
       };
     }
-  }, [count, playOpener, playSound]);
+  }, [count, playIntro, playSound]);
 
   return (
     <div className="relative flex items-center justify-center h-full overflow-hidden">

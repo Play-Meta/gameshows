@@ -5,7 +5,7 @@ import { useGame } from '@/contexts/GameContext';
 import { useSound } from '@/hooks/useSound';
 
 const AnswerSelector: React.FC = () => {
-  const { currentQuestion, selectAnswer, isEliminated } = useGame();
+  const { currentQuestion, selectAnswer, playAnswerVideo, isEliminated } = useGame();
   const { playSound } = useSound();
   const [timeLeft, setTimeLeft] = useState(currentQuestion?.timeLimit || 7);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null); // Local state for locked answer
@@ -34,18 +34,22 @@ const AnswerSelector: React.FC = () => {
       return () => clearTimeout(timer);
     }
     
-    // Time's up - now submit answers and show results for everyone simultaneously
+    // Time's up - store the selected answer and play answer video
     if (selectedAnswer === null && !isEliminated) {
       // No answer selected - auto-eliminate
       selectAnswer(-1);
-    } else {
-      // Answer was selected or player is eliminated - proceed to results
-      const advanceTimer = setTimeout(() => {
-        selectAnswer(selectedAnswer ?? -1); // Submit the selected answer (or -1 if eliminated)
-      }, 100);
-      return () => clearTimeout(advanceTimer);
+    } else if (!isEliminated && selectedAnswer !== null) {
+      // Answer was selected - submit it
+      selectAnswer(selectedAnswer);
     }
-  }, [timeLeft, selectedAnswer, selectAnswer, playSound, isEliminated]);
+    
+    // Play answer video for everyone after a brief delay
+    const videoTimer = setTimeout(() => {
+      playAnswerVideo();
+    }, 100);
+    
+    return () => clearTimeout(videoTimer);
+  }, [timeLeft, selectedAnswer, selectAnswer, playAnswerVideo, playSound, isEliminated]);
 
   const handleAnswerClick = (index: number) => {
     if (selectedAnswer !== null || isEliminated) return; // Already selected or eliminated
@@ -80,8 +84,7 @@ const AnswerSelector: React.FC = () => {
                   timeLeft <= 3 ? 'bg-red-500' : 'bg-green-500'
                 }`}
                 style={{ 
-                  animation: selectedAnswer === null ? `timerCountdown ${currentQuestion.timeLimit}s linear forwards` : 'none',
-                  width: selectedAnswer !== null ? '0%' : '100%'
+                  animation: `timerCountdown ${currentQuestion.timeLimit}s linear forwards`
                 }}
               />
             </div>

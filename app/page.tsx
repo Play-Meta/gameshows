@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { GrainGradient } from '@paper-design/shaders-react';
 import { GameProvider, useGame } from '@/contexts/GameContext';
+import { getQuizBySlug, bourdainQuiz } from '@/config/quizzes';
 import MobilePhoneFrame from '@/components/MobilePhoneFrame';
 import Header from '@/components/Header';
 import ShowIdentity from '@/components/ShowIdentity';
@@ -10,13 +11,11 @@ import EliminatedBanner from '@/components/EliminatedBanner';
 import DevToolbar from '@/components/DevToolbar';
 import WaitingRoom from '@/components/WaitingRoom';
 import Countdown from '@/components/Countdown';
-import OpenerVideo from '@/components/OpenerVideo';
 import IntroVideo from '@/components/IntroVideo';
 import QuestionPlayer from '@/components/QuestionPlayer';
 import AnswerSelector from '@/components/AnswerSelector';
+import AnswerVideo from '@/components/AnswerVideo';
 import ResultScreen from '@/components/ResultScreen';
-import EliminatedScreen from '@/components/EliminatedScreen';
-import WrapUpVideo from '@/components/WrapUpVideo';
 import CloserVideo from '@/components/CloserVideo';
 import WinnerScreen from '@/components/WinnerScreen';
 import RealtimeCommentSection from '@/components/RealtimeCommentSection';
@@ -62,12 +61,11 @@ function GameContent() {
         {/* Game screens */}
         {gameState === 'waiting' && <WaitingRoom />}
         {gameState === 'countdown' && <Countdown />}
-        {gameState === 'opener' && <OpenerVideo />}
         {gameState === 'intro' && <IntroVideo />}
         {gameState === 'question-video' && <QuestionPlayer />}
         {gameState === 'answering' && <AnswerSelector />}
+        {gameState === 'answer-video' && <AnswerVideo />}
         {gameState === 'result' && <ResultScreen />}
-        {gameState === 'wrapup' && <WrapUpVideo />}
         {gameState === 'closer' && <CloserVideo />}
         {gameState === 'winner' && <WinnerScreen />}
         
@@ -79,8 +77,22 @@ function GameContent() {
 }
 
 export default function Home() {
+  // Read URL parameter synchronously before first render
+  const [selectedQuiz] = useState(() => {
+    // This function only runs once during initialization
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const quizSlug = urlParams.get('quiz');
+      
+      if (quizSlug) {
+        return getQuizBySlug(quizSlug);
+      }
+    }
+    return bourdainQuiz;
+  });
+
   return (
-    <GameProvider>
+    <GameProvider initialQuiz={selectedQuiz}>
       <GameContent />
     </GameProvider>
   );

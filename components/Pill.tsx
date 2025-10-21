@@ -20,7 +20,7 @@ const Pill: React.FC<PillProps> = ({
 }) => {
   // Size variants
   const sizeClasses = {
-    sm: 'px-2 pt-0.5 pb-1',
+    sm: 'px-2 pt-1 pb-1',
     lg: 'px-3 py-1.5'
   };
 
@@ -31,7 +31,7 @@ const Pill: React.FC<PillProps> = ({
   };
 
   // Icon size based on pill size
-  const iconSize = size === 'sm' ? 12 : 20;
+  const iconSize = size === 'sm' ? 10 : 20;
 
   return (
     <div className={`flex items-center gap-1 rounded-full ${sizeClasses[size]} ${typeClasses[type]}`}>
@@ -41,7 +41,6 @@ const Pill: React.FC<PillProps> = ({
           alt={iconAlt}
           width={iconSize}
           height={iconSize}
-          className="opacity-80"
         />
       )}
       <span className="text-white text-xs font-semibold leading-none">
