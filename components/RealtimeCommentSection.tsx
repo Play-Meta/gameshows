@@ -175,7 +175,7 @@ const RealtimeCommentSection: React.FC = () => {
                 >
                   {comment.username}
                 </span>
-                <span className="mx-1.5 text-white/60">·</span>
+                <span className="mx-0.5 text-white/60"></span>
                 <span className="text-white drop-shadow-lg">{comment.message}</span>
               </div>
             </div>

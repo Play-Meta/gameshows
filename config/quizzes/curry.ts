@@ -25,7 +25,7 @@ export const curryQuiz: QuizConfig = {
       videoUrl: '/videos/curry/q1-question.mp4',
       answerVideoUrl: '/videos/curry/q1-answer.mp4',
       question: 'During our 2022 championship run, I debuted a new celebration that took over the world after big shots. What was it?',
-      options: ['The Shimmy', 'Night Night', 'The Splash', 'The Three Goggles'],
+      options: ['The Shimmy', 'Night Night', 'The Splash', 'The Goggles'],
       correctAnswer: 1, // Night Night
       timeLimit: 7
     },

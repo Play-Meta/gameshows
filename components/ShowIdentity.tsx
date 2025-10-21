@@ -18,8 +18,8 @@ const ShowIdentity: React.FC = () => {
     return count.toString();
   };
 
-  // Show viewer count after game starts (not on waiting screen)
-  const showViewerCount = gameState !== 'waiting';
+  // Always show the player/viewer count
+  const isWaitingScreen = gameState === 'waiting';
 
   return (
     <div className="absolute top-16 left-0 right-0 z-50 px-3" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif' }}>
@@ -78,29 +78,24 @@ const ShowIdentity: React.FC = () => {
           Live
         </Pill>
 
-        {/* Viewer Count - Animated entrance */}
-        <AnimatePresence>
-          {showViewerCount && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, x: -10 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              exit={{ opacity: 0, scale: 0.8, x: -10 }}
-              transition={{ 
-                duration: 0.4, 
-                ease: [0.34, 1.56, 0.64, 1] // Nice bounce easing
-              }}
-            >
-              <Pill 
-                type="default" 
-                size="sm" 
-                icon="/icon-eye.png"
-                iconAlt="Viewers"
-              >
-                {formatViewerCount(playerCount)}
-              </Pill>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Player/Viewer Count - Always visible */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, x: -10 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          transition={{ 
+            duration: 0.4, 
+            ease: [0.34, 1.56, 0.64, 1]
+          }}
+        >
+          <Pill 
+            type="default" 
+            size="sm" 
+            icon="/icon-eye.png"
+            iconAlt={isWaitingScreen ? "Players" : "Viewers"}
+          >
+            {formatViewerCount(playerCount)}
+          </Pill>
+        </motion.div>
       </div>
     </div>
   );

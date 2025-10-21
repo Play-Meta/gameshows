@@ -84,8 +84,7 @@ const AnswerSelector: React.FC = () => {
                   timeLeft <= 3 ? 'bg-red-500' : 'bg-green-500'
                 }`}
                 style={{ 
-                  animation: selectedAnswer === null ? `timerCountdown ${currentQuestion.timeLimit}s linear forwards` : 'none',
-                  width: selectedAnswer !== null ? '0%' : '100%'
+                  animation: `timerCountdown ${currentQuestion.timeLimit}s linear forwards`
                 }}
               />
             </div>
