@@ -14,16 +14,16 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Meta Gameshows",
+    title: "Gameshows by Meta",
     description: "Live trivia game show experience",
     url: "https://gameshows.vercel.app",
-    siteName: "Meta Gameshows",
+    siteName: "Gameshows by Meta",
     images: [
       {
         url: "/OGsocialCard.jpg",
         width: 1200,
         height: 630,
-        alt: "Meta Gameshows - Live trivia experience",
+        alt: "Gameshows by Meta - A live trivia experience",
       },
     ],
     locale: "en_US",
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Meta Gameshows",
-    description: "Live trivia game show experience",
+    title: "Gameshows by Meta",
+    description: "A live trivia gameshow experience",
     images: ["/OGsocialCard.jpg"],
   },
 };
