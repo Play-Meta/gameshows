@@ -62,7 +62,7 @@ const WaitingRoom: React.FC = () => {
         />
 
         {/* Player Count */}
-        <div className="text-center flex flex-col items-center gap-1" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif' }}>
+        <div className="text-center flex flex-col items-center gap-3" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif' }}>
           <div className="text-xs tracking-wider">
             <SlotCounter 
               value={playerCount.toLocaleString()}
@@ -77,6 +77,14 @@ const WaitingRoom: React.FC = () => {
           <div className="text-xs text-white tracking-wider">
             Players Waiting
           </div>
+          
+          {/* Start Button */}
+          <button
+            onClick={handleStart}
+            className="px-6 py-2 bg-white text-black text-sm font-semibold rounded-full transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-lg"
+          >
+            Start
+          </button>
         </div>
       </div>
     </div>
